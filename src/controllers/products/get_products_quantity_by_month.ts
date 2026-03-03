@@ -23,8 +23,8 @@ export const getProductsQuantityByMonth = async (c: Context) => {
     WHERE item_id = $1
       AND invoice_date >= (CURRENT_DATE - INTERVAL '12 months')
       AND deleted_at IS NULL
-    GROUP BY TO_CHAR(invoice_date, 'Mon YYYY')
-    ORDER BY invoice_date DESC
+    GROUP BY TO_CHAR(invoice_date, 'Mon YYYY'), DATE_TRUNC('month', invoice_date)
+    ORDER BY DATE_TRUNC('month', invoice_date) DESC
     `,
     [itemId]
   );
