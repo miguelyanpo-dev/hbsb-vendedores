@@ -5,6 +5,7 @@ import { createKardex } from '../controllers/products/create_products';
 import { getKardexById } from '../controllers/products/get_product_id';
 import { updateKardex } from '../controllers/products/update_product';
 import { deleteKardex } from '../controllers/products/delete_products';
+import { getProductsNames } from '../controllers/products/get_products_names';
 import {
   CreateProductsSchema,
   GetProductsQuerySchema,
@@ -313,6 +314,49 @@ router.openapi(
     },
   }),
   getKardexById as any
+);
+
+router.openapi(
+  createRoute({
+    method: 'get',
+    path: '/products_names',
+    request: {
+      query: RefQuerySchema,
+    },
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              success: z.boolean(),
+              data: z.array(z.object({
+                code: z.string(),
+                combine_names: z.string()
+              }))
+            }),
+          },
+        },
+        description: 'Get products names with code and combine_names',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  getProductsNames as any
 );
 
 export default router;
