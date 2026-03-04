@@ -11,7 +11,7 @@ export const getProductsNames = async (c: Context) => {
 
   const { rows } = await db.query(
     `
-    SELECT code, combine_names
+    SELECT code, name, combine_names
     FROM products
     WHERE deleted_at IS NULL
     ORDER BY code
