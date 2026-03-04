@@ -7,11 +7,13 @@ import { updateKardex } from '../controllers/products/update_product';
 import { deleteKardex } from '../controllers/products/delete_products';
 import { getProductsNames } from '../controllers/products/get_products_names';
 import { getProductsQuantityByMonth } from '../controllers/products/get_products_quantity_by_month';
+import { getTopCustomersByProduct } from '../controllers/products/get_top_customers_by_product';
 import {
   CreateProductsSchema,
   GetProductsQuerySchema,
   GetProductsNamesQuerySchema,
   GetProductsQuantityByMonthQuerySchema,
+  GetTopCustomersByProductQuerySchema,
   PaginatedProductsResponseSchema,
   UpdateProductsSchema,
 
@@ -403,6 +405,65 @@ router.openapi(
     },
   }),
   getKardexById as any
+);
+
+router.openapi(
+  createRoute({
+    method: 'get',
+    path: '/top_customers',
+    request: {
+      query: GetTopCustomersByProductQuerySchema,
+    },
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              success: z.boolean(),
+              data: z.array(z.record(z.string(), z.object({
+                "cantidad total": z.string(),
+                "Mar 2026": z.string().optional(),
+                "Feb 2026": z.string().optional(),
+                "Ene 2026": z.string().optional(),
+                "Dic 2025": z.string().optional(),
+                "Nov 2025": z.string().optional(),
+                "Oct 2025": z.string().optional(),
+                "Sep 2025": z.string().optional(),
+                "Ago 2025": z.string().optional(),
+                "Jul 2025": z.string().optional(),
+                "Jun 2025": z.string().optional(),
+                "May 2025": z.string().optional(),
+                "Abr 2025": z.string().optional()
+              }))),
+              data_items: z.number(),
+              page_current: z.number(),
+              page_total: z.number(),
+              have_next_page: z.boolean(),
+              have_previus_page: z.boolean()
+            }),
+          },
+        },
+        description: 'Get top customers by product with monthly distribution',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  getTopCustomersByProduct as any
 );
 
 
