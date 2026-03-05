@@ -97,10 +97,7 @@ export const CreateAliadoProductsSchema = z.object({
   item_cost: z.number().optional(),
   item_price_sell: z.number().optional(),
   item_rate_taxes: z.number().optional(),
-  item_taxes: z.number().optional(),
-  item_price_sell_taxes: z.number().optional(),
   item_stock: z.number().optional(),
-  item_combinated_names: z.string().optional(),
 });
 
 export const UpdateAliadoProductsSchema = z.object({
@@ -112,10 +109,7 @@ export const UpdateAliadoProductsSchema = z.object({
   item_cost: z.number().optional(),
   item_price_sell: z.number().optional(),
   item_rate_taxes: z.number().optional(),
-  item_taxes: z.number().optional(),
-  item_price_sell_taxes: z.number().optional(),
   item_stock: z.number().optional(),
-  item_combinated_names: z.string().optional(),
 });
 
 export const GetAliadoProductsQuerySchema = z.object({

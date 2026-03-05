@@ -82,103 +82,84 @@ export class AliadoProductsService {
   }
 
   // Crear nuevo producto aliado
-  static async create(db: Pool, data: any) {
-    // Validar si item_id ya existe
-    if (data.item_id) {
-      const { rows: existingRows } = await db.query(
-        `
-        SELECT id FROM aliado_products 
-        WHERE item_id = $1 AND deleted_at IS NULL
-        `,
-        [data.item_id]
-      );
-
-      if (existingRows.length > 0) {
-        throw new Error('Ya existe un producto con este item_id');
-      }
-    }
-
-    const { rows } = await db.query(
-      `
-      INSERT INTO aliado_products (
-        item_id,
-        item_code,
-        item_name,
-        item_image,
-        item_description,
-        item_cost,
-        item_price_sell,
-        item_rate_taxes,
-        item_taxes,
-        item_price_sell_taxes,
-        item_stock,
-        item_combinated_names
-      )
-      VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-      )
-      RETURNING *
-      `,
-      [
-        data.item_id ?? null,
-        data.item_code ?? null,
-        data.item_name ?? null,
-        data.item_image ?? null,
-        data.item_description ?? null,
-        data.item_cost ?? null,
-        data.item_price_sell ?? null,
-        data.item_rate_taxes ?? null,
-        data.item_taxes ?? null,
-        data.item_price_sell_taxes ?? null,
-        data.item_stock ?? null,
-        data.item_combinated_names ?? null,
-      ]
+static async create(db: Pool, data: any) {
+  if (data.item_id) {
+    const { rows: existingRows } = await db.query(
+      `SELECT id FROM aliado_products WHERE item_id = $1 AND deleted_at IS NULL`,
+      [data.item_id]
     );
-
-    return rows[0];
+    if (existingRows.length > 0) {
+      throw new Error('Ya existe un producto con este item_id');
+    }
   }
+
+  const { rows } = await db.query(
+    `
+    INSERT INTO aliado_products (
+      item_id,
+      item_code,
+      item_name,
+      item_image,
+      item_description,
+      item_cost,
+      item_price_sell,
+      item_rate_taxes,
+      item_stock
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    RETURNING *
+    `,
+    [
+      data.item_id ?? null,
+      data.item_code ?? null,
+      data.item_name ?? null,
+      data.item_image ?? null,
+      data.item_description ?? null,
+      data.item_cost ?? null,
+      data.item_price_sell ?? null,
+      data.item_rate_taxes ?? null,
+      data.item_stock ?? null,
+    ]
+  );
+
+  return rows[0];
+}
 
   // Actualizar producto aliado
   static async update(db: Pool, id: number, data: any) {
-    const { rows } = await db.query(
-      `
-      UPDATE aliado_products
-      SET
-        item_id = COALESCE($1, item_id),
-        item_code = COALESCE($2, item_code),
-        item_name = COALESCE($3, item_name),
-        item_image = COALESCE($4, item_image),
-        item_description = COALESCE($5, item_description),
-        item_cost = COALESCE($6, item_cost),
-        item_price_sell = COALESCE($7, item_price_sell),
-        item_rate_taxes = COALESCE($8, item_rate_taxes),
-        item_taxes = COALESCE($9, item_taxes),
-        item_price_sell_taxes = COALESCE($10, item_price_sell_taxes),
-        item_stock = COALESCE($11, item_stock),
-        item_combinated_names = COALESCE($12, item_combinated_names),
-        updated_at = now()
-      WHERE id = $13 AND deleted_at IS NULL
-      RETURNING *
-      `,
-      [
-        data.item_id ?? null,
-        data.item_code ?? null,
-        data.item_name ?? null,
-        data.item_image ?? null,
-        data.item_description ?? null,
-        data.item_cost ?? null,
-        data.item_price_sell ?? null,
-        data.item_rate_taxes ?? null,
-        data.item_taxes ?? null,
-        data.item_price_sell_taxes ?? null,
-        data.item_stock ?? null,
-        data.item_combinated_names ?? null,
-        id,
-      ]
-    );
+  const { rows } = await db.query(
+    `
+    UPDATE aliado_products
+    SET
+      item_id = COALESCE($1, item_id),
+      item_code = COALESCE($2, item_code),
+      item_name = COALESCE($3, item_name),
+      item_image = COALESCE($4, item_image),
+      item_description = COALESCE($5, item_description),
+      item_cost = COALESCE($6, item_cost),
+      item_price_sell = COALESCE($7, item_price_sell),
+      item_rate_taxes = COALESCE($8, item_rate_taxes),
+      item_stock = COALESCE($9, item_stock),
+      updated_at = now()
+    WHERE id = $10 AND deleted_at IS NULL
+    RETURNING *
+    `,
+    [
+      data.item_id ?? null,
+      data.item_code ?? null,
+      data.item_name ?? null,
+      data.item_image ?? null,
+      data.item_description ?? null,
+      data.item_cost ?? null,
+      data.item_price_sell ?? null,
+      data.item_rate_taxes ?? null,
+      data.item_stock ?? null,
+      id,
+    ]
+  );
 
-    return rows[0];
-  }
+  return rows[0];
+}
 
   // Eliminar producto aliado (soft delete)
   static async deactivate(
