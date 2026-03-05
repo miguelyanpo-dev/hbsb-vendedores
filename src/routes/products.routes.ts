@@ -1,14 +1,5 @@
 import { OpenAPIHono, createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
-import { getKardex } from '../controllers/products/get_products';
-import { createKardex } from '../controllers/products/create_products';
-import { getKardexById } from '../controllers/products/get_product_id';
-import { updateKardex } from '../controllers/products/update_product';
-import { deleteKardex } from '../controllers/products/delete_products';
-import { getProductsNames } from '../controllers/products/get_products_names';
-import { getProductsQuantityByMonth } from '../controllers/products/get_products_quantity_by_month';
-import { getTopCustomersByProduct } from '../controllers/products/get_top_customers_by_product';
-import { createKardexBuy } from '../controllers/products/create_products_buy';
 
 // Aliado Products Controllers
 import { getAliadoProducts } from '../controllers/aliado_products/get_aliado_products';
@@ -17,17 +8,21 @@ import { createAliadoProduct } from '../controllers/aliado_products/create_aliad
 import { updateAliadoProduct } from '../controllers/aliado_products/update_aliado_product';
 import { deleteAliadoProduct } from '../controllers/aliado_products/delete_aliado_product';
 import { getAllAliadoProducts } from '../controllers/aliado_products/get_all_aliado_products';
+
+// Kardex Products Buyed Controllers
+import { getKardexProductsBuyed } from '../controllers/kardex_products_buyed/get_kardex_products_buyed';
+import { getKardexProductsBuyedById } from '../controllers/kardex_products_buyed/get_kardex_products_buyed_id';
+import { createKardexProductsBuyed } from '../controllers/kardex_products_buyed/create_kardex_products_buyed';
+import { updateKardexProductsBuyed } from '../controllers/kardex_products_buyed/update_kardex_products_buyed';
+import { deleteKardexProductsBuyed } from '../controllers/kardex_products_buyed/delete_kardex_products_buyed';
 import {
-  CreateProductsSchema,
-  GetProductsQuerySchema,
-  GetProductsNamesQuerySchema,
-  GetProductsQuantityByMonthQuerySchema,
-  GetTopCustomersByProductQuerySchema,
   PaginatedProductsResponseSchema,
-  UpdateProductsSchema,
   CreateAliadoProductsSchema,
   UpdateAliadoProductsSchema,
   GetAliadoProductsQuerySchema,
+  CreateKardexProductsBuyedSchema,
+  UpdateKardexProductsBuyedSchema,
+  GetKardexProductsBuyedQuerySchema,
 } from '../schemas/products.schemas';
 import { ErrorResponse, SuccessResponse } from '../schemas/response.schemas';
 
@@ -41,477 +36,9 @@ const RefQuerySchema = z.object({
   ref: z.string().optional(),
 });
 
-router.openapi(
-  createRoute({
-    method: 'get',
-    path: '/',
-    request: {
-      query: GetProductsQuerySchema,
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: PaginatedProductsResponseSchema,
-          },
-        },
-        description: 'List kardex with pagination',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  getKardex as any
-);
+// Routes GET
 
-router.openapi(
-  createRoute({
-    method: 'get',
-    path: '/products_names',
-    request: {
-      query: GetProductsNamesQuerySchema,
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: z.object({
-              success: z.boolean(),
-              data: z.array(z.object({
-                code: z.string(),
-                combine_names: z.string()
-              }))
-            }),
-          },
-        },
-        description: 'Get products names with code and combine_names',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  getProductsNames as any
-);
-
-router.openapi(
-  createRoute({
-    method: 'get',
-    path: '/quantity_by_month',
-    request: {
-      query: GetProductsQuantityByMonthQuerySchema,
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: z.object({
-              success: z.boolean(),
-              data: z.array(z.object({
-                month: z.string(),
-                quantity: z.number()
-              }))
-            }),
-          },
-        },
-        description: 'Get products quantity by month for last 12 months',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  getProductsQuantityByMonth as any
-);
-router.openapi(
-  createRoute({
-    method: 'get',
-    path: '/top_customers',
-    request: {
-      query: GetTopCustomersByProductQuerySchema,
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: z.object({
-              success: z.boolean(),
-              data: z.array(z.object({
-                client_name: z.string(),
-                cantidad_total: z.string(),
-                meses: z.record(z.string(), z.string())
-              })),
-              data_items: z.number(),
-              page_current: z.number(),
-              page_total: z.number(),
-              have_next_page: z.boolean(),
-              have_previus_page: z.boolean()
-            }),
-          },
-        },
-        description: 'Get top customers by product with monthly distribution',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  getTopCustomersByProduct as any
-);
-
-router.openapi(
-  createRoute({
-    method: 'get',
-    path: '/{id}',
-    request: {
-      params: IdParamSchema,
-      query: RefQuerySchema,
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: SuccessResponse,
-          },
-        },
-        description: 'Get kardex by id',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      404: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Not Found',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  getKardexById as any
-);
-
-router.openapi(
-  createRoute({
-    method: 'post',
-    path: '/',
-    request: {
-      query: RefQuerySchema,
-      body: {
-        content: {
-          'application/json': {
-            schema: CreateProductsSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        content: {
-          'application/json': {
-            schema: SuccessResponse,
-          },
-        },
-        description: 'Created',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  createKardex as any
-);
-
-router.openapi(
-  createRoute({
-    method: 'post',
-    path: '/products_buy',
-    request: {
-      query: RefQuerySchema,
-      body: {
-        content: {
-          'application/json': {
-            schema: CreateProductsSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        content: {
-          'application/json': {
-            schema: SuccessResponse,
-          },
-        },
-        description: 'Created',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  createKardexBuy as any
-);
-
-
-router.openapi(
-  createRoute({
-    method: 'patch',
-    path: '/{id}',
-    request: {
-      params: IdParamSchema,
-      query: RefQuerySchema,
-      body: {
-        content: {
-          'application/json': {
-            schema: UpdateProductsSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: SuccessResponse,
-          },
-        },
-        description: 'Updated',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      404: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Not Found',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  updateKardex as any
-);
-
-router.openapi(
-  createRoute({
-    method: 'put',
-    path: '/{id}',
-    request: {
-      params: IdParamSchema,
-      query: RefQuerySchema,
-      body: {
-        content: {
-          'application/json': {
-            schema: UpdateProductsSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: SuccessResponse,
-          },
-        },
-        description: 'Updated',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      404: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Not Found',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  updateKardex as any
-);
-
-router.openapi(
-  createRoute({
-    method: 'delete',
-    path: '/{id}',
-    request: {
-      params: IdParamSchema,
-      query: RefQuerySchema,
-      body: {
-        content: {
-          'application/json': {
-            schema: z.object({
-              updated_by_user_name: z.string().optional(),
-              updated_by_user_id: z.string().optional(),
-            }),
-          },
-        },
-        required: false,
-      },
-    },
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: SuccessResponse,
-          },
-        },
-        description: 'Deactivated',
-      },
-      400: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Bad Request',
-      },
-      404: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Not Found',
-      },
-      500: {
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-        description: 'Internal Server Error',
-      },
-    },
-  }),
-  deleteKardex as any
-);
-
-// Aliado Products Routes
-
+// aliado_products GET
 router.openapi(
   createRoute({
     method: 'get',
@@ -549,6 +76,85 @@ router.openapi(
   getAliadoProducts as any
 );
 
+// aliado_products GET all
+router.openapi(
+  createRoute({
+    method: 'get',
+    path: '/aliado_products/all',
+    request: {
+      query: RefQuerySchema,
+    },
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: SuccessResponse,
+          },
+        },
+        description: 'Get all aliado products without pagination',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  getAllAliadoProducts as any
+);
+
+// kardex_products_buyed GET
+router.openapi(
+  createRoute({
+    method: 'get',
+    path: '/kardex_products_buyed',
+    request: {
+      query: GetKardexProductsBuyedQuerySchema,
+    },
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: PaginatedProductsResponseSchema,
+          },
+        },
+        description: 'List kardex products buyed with pagination',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  getKardexProductsBuyed as any
+);
+
+// Routes GET by id
+
+// aliado_products GET by id
 router.openapi(
   createRoute({
     method: 'get',
@@ -595,6 +201,56 @@ router.openapi(
   getAliadoProductById as any
 );
 
+// kardex_products_buyed GET by id
+router.openapi(
+  createRoute({
+    method: 'get',
+    path: '/kardex_products_buyed/{id}',
+    request: {
+      params: IdParamSchema,
+      query: RefQuerySchema,
+    },
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: SuccessResponse,
+          },
+        },
+        description: 'Get kardex product buyed by id',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      404: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Not Found',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  getKardexProductsBuyedById as any
+);
+
+// Routes POST
+
+// aliado_products POST 
 router.openapi(
   createRoute({
     method: 'post',
@@ -639,6 +295,55 @@ router.openapi(
   createAliadoProduct as any
 );
 
+// kardex_products_buyed POST 
+router.openapi(
+  createRoute({
+    method: 'post',
+    path: '/kardex_products_buyed',
+    request: {
+      query: RefQuerySchema,
+      body: {
+        content: {
+          'application/json': {
+            schema: CreateKardexProductsBuyedSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        content: {
+          'application/json': {
+            schema: SuccessResponse,
+          },
+        },
+        description: 'Created',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  createKardexProductsBuyed as any
+);
+
+
+// Routes PATCH and PUT
+
+// aliado_products PATCH 
 router.openapi(
   createRoute({
     method: 'patch',
@@ -692,6 +397,61 @@ router.openapi(
   updateAliadoProduct as any
 );
 
+// kardex_products_buyed PATCH 
+router.openapi(
+  createRoute({
+    method: 'patch',
+    path: '/kardex_products_buyed/{id}',
+    request: {
+      params: IdParamSchema,
+      query: RefQuerySchema,
+      body: {
+        content: {
+          'application/json': {
+            schema: UpdateKardexProductsBuyedSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: SuccessResponse,
+          },
+        },
+        description: 'Updated',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      404: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Not Found',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  updateKardexProductsBuyed as any
+);
+
+// aliado_products PUT
 router.openapi(
   createRoute({
     method: 'put',
@@ -745,6 +505,63 @@ router.openapi(
   updateAliadoProduct as any
 );
 
+// kardex_products_buyed PUT
+router.openapi(
+  createRoute({
+    method: 'put',
+    path: '/kardex_products_buyed/{id}',
+    request: {
+      params: IdParamSchema,
+      query: RefQuerySchema,
+      body: {
+        content: {
+          'application/json': {
+            schema: UpdateKardexProductsBuyedSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: SuccessResponse,
+          },
+        },
+        description: 'Updated',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Bad Request',
+      },
+      404: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Not Found',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Internal Server Error',
+      },
+    },
+  }),
+  updateKardexProductsBuyed as any
+);
+
+// Routes DELETE
+
+// aliado_products DELETE
 router.openapi(
   createRoute({
     method: 'delete',
@@ -802,13 +619,25 @@ router.openapi(
   deleteAliadoProduct as any
 );
 
-// Ruta para obtener todos los productos aliados sin límites
+// kardex_products_buyed DELETE
 router.openapi(
   createRoute({
-    method: 'get',
-    path: '/aliado_products/all',
+    method: 'delete',
+    path: '/kardex_products_buyed/{id}',
     request: {
+      params: IdParamSchema,
       query: RefQuerySchema,
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              updated_by_user_name: z.string().optional(),
+              updated_by_user_id: z.string().optional(),
+            }),
+          },
+        },
+        required: false,
+      },
     },
     responses: {
       200: {
@@ -817,7 +646,7 @@ router.openapi(
             schema: SuccessResponse,
           },
         },
-        description: 'Get all aliado products without pagination',
+        description: 'Deactivated',
       },
       400: {
         content: {
@@ -826,6 +655,14 @@ router.openapi(
           },
         },
         description: 'Bad Request',
+      },
+      404: {
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+        description: 'Not Found',
       },
       500: {
         content: {
@@ -837,7 +674,9 @@ router.openapi(
       },
     },
   }),
-  getAllAliadoProducts as any
+  deleteKardexProductsBuyed as any
 );
 
 export default router;
+
+
