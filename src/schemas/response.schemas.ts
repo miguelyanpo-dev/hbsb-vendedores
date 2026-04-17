@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 
 // Schema para la respuesta exitosa
 export const SuccessResponse = z.object({
